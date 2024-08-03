@@ -43,10 +43,16 @@ const createUser = async (req: Request, res: Response, next: NextFunction) => {
     const token = sign({ sub: newUser._id }, config.jwtSecret as string, {
       expiresIn: "7d",
     });
-    res.json({ accessToken: token });
+    res.status(201).json({ accessToken: token });
   } catch (error) {
     return next(createHttpError(500, "Error while signing jwt token"));
   }
-};
+}
 
-export { createUser };
+
+const loginUser = async (req:Request, res:Response,next:NextFunction) => {
+  res.json({message: "All Ok!"});
+}
+
+
+export { createUser,loginUser };
