@@ -2,13 +2,12 @@ import { NextFunction, Request, Response } from "express";
 import cloudinary from "../config/cloudinary";
 import path, { format } from "node:path";
 import createHttpError from "http-errors";
+import bookModel from "./bookModel";
+import fs from "node:fs"
 
 const createBook = async (req: Request, res: Response, next: NextFunction) =>{
 
-  // const {} = req.body;
-
-
-
+  const {title,genre} = req.body;
 
   try {
 
@@ -24,8 +23,6 @@ const createBook = async (req: Request, res: Response, next: NextFunction) =>{
       format : coverImageMimeType,
     })
   
-    console.log("Upload result: " + uploadResult);
-
 
     const bookFileName = files.file[0].filename;
     const bookFilePath = path.resolve(__dirname, '../../public/data/uploads', bookFileName);
@@ -35,7 +32,27 @@ const createBook = async (req: Request, res: Response, next: NextFunction) =>{
       folder: 'book-pdfs',
       format: "pdf"
     })
+    console.log("Upload result: " + uploadResult);
     console.log("bookfileUploadResult: " + bookFileUploadResult)
+
+    const newBook = await bookModel.create({
+      title,
+      genre,
+      author : "66ae22fdb10fb1d647529ad6",
+      coverImage: uploadResult.secure_url,
+      file: bookFileUploadResult.secure_url,
+    })
+
+    // Delete temp files 
+    try {
+      await fs.promises.unlink(filePath);
+      await fs.promises.unlink(bookFilePath);
+
+      return res.status(201).json({id: newBook._id})
+    } catch (error) {
+      return next(createHttpError(400,"error deleting temporary files"))
+    }
+
     res.json({})
 
 
