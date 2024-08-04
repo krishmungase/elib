@@ -48,7 +48,7 @@ const createBook = async (req: Request, res: Response, next: NextFunction) => {
       title,
       genre,
       description,
-      author: _req.userId,
+      author:_req.userId,
       coverImage: uploadResult.secure_url,
       file: bookFileUploadResult.secure_url,
     });
@@ -194,7 +194,7 @@ const getSingleBook = async(req: Request, res: Response, next: NextFunction)=>{
 const deleteBook = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const bookId = req.params.bookId;
-    const book = await bookModel.findOne({ _id: bookId }).populate("author", "name");
+    const book = await bookModel.findOne({ _id: bookId });
     if(!book) {
       return next(createHttpError(404, "Book not found"));
     }
