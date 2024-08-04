@@ -7,7 +7,7 @@ import fs from "node:fs";
 import { AuthRequest } from "../middlewares/authenticate";
 
 const createBook = async (req: Request, res: Response, next: NextFunction) => {
-  const { title, genre } = req.body;
+  const { title, genre,description } = req.body;
 
   try {
     console.log("files", req.files);
@@ -47,6 +47,7 @@ const createBook = async (req: Request, res: Response, next: NextFunction) => {
     const newBook = await bookModel.create({
       title,
       genre,
+      description,
       author: _req.userId,
       coverImage: uploadResult.secure_url,
       file: bookFileUploadResult.secure_url,
@@ -70,7 +71,7 @@ const createBook = async (req: Request, res: Response, next: NextFunction) => {
 };
 
 const updateBook = async (req: Request, res: Response, next: NextFunction) => {
-  const { title, genre } = req.body;
+  const { title, genre,description } = req.body;
   const bookId = req.params.bookId;
 
 
@@ -147,6 +148,7 @@ const updateBook = async (req: Request, res: Response, next: NextFunction) => {
     {
       title,
       genre,
+      description,
       coverImage: completeCoverImage ? completeCoverImage : book.coverImage,
       file: completeFileName ? completeFileName : book.file,
     },
@@ -192,7 +194,7 @@ const getSingleBook = async(req: Request, res: Response, next: NextFunction)=>{
 const deleteBook = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const bookId = req.params.bookId;
-    const book = await bookModel.findOne({ _id: bookId });
+    const book = await bookModel.findOne({ _id: bookId }).populate("author", "name");
     if(!book) {
       return next(createHttpError(404, "Book not found"));
     }
