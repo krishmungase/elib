@@ -156,7 +156,7 @@ const getSingleBook = async (
 ) => {
   try {
     const bookId = req.params.bookId;
-    const getSingleBook = await bookModel.findOne({ _id: bookId });
+    const getSingleBook = await bookModel.findOne({ _id: bookId }).populate("author", "name");
     if (!getSingleBook) {
       return next(createHttpError(404, "Book not found"));
     }
